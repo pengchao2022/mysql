@@ -1,0 +1,35 @@
+1， 开启防火墙端口号 3306 允许：
+
+[root@mysql ~]# firewall-cmd --add-port=3306/tcp --permanent
+success
+
+2， 重启防火墙：
+
+[root@mysql ~]# systemctl restart firewalld
+[root@mysql ~]# 
+
+3， 进入 mysql : 
+
+[root@mysql ~]# mysql -u root -p 
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 8.0.28 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+4, 创建远程登录用户 allen:
+
+mysql> CREATE USER 'allen'@'%' IDENTIFIED BY '12345678';
+Query OK, 0 rows affected (0.04 sec)
+
+5, 给远程用户 allen 授予权限：
+
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'allen'@'%';
+Query OK, 0 rows affected (0.01 sec)
+
+6， 测试下：
+
+成功完成。
+
+
