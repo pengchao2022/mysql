@@ -1,0 +1,141 @@
+1，wget 命令下载 mysql communiity 8.0.23 tar 包： 注意去官网下载相应的 tar 包
+
+[root@mysql ~]# wget https://cdn.mysql.com/archives/mysql-8.0/mysql-8.0.28-1.el7.x86_64.rpm-bundle.tar
+
+2, 解压 tar 包：
+
+[root@mysql ~]# tar -xvf mysql-8.0.28-1.el7.x86_64.rpm-bundle.tar 
+mysql-community-client-8.0.28-1.el7.x86_64.rpm
+mysql-community-client-plugins-8.0.28-1.el7.x86_64.rpm
+mysql-community-common-8.0.28-1.el7.x86_64.rpm
+mysql-community-devel-8.0.28-1.el7.x86_64.rpm
+mysql-community-embedded-compat-8.0.28-1.el7.x86_64.rpm
+mysql-community-icu-data-files-8.0.28-1.el7.x86_64.rpm
+mysql-community-libs-8.0.28-1.el7.x86_64.rpm
+mysql-community-libs-compat-8.0.28-1.el7.x86_64.rpm
+mysql-community-server-8.0.28-1.el7.x86_64.rpm
+mysql-community-test-8.0.28-1.el7.x86_64.rpm
+[root@mysql ~]# 
+
+3，安装前 检查 有没有之前的 MySQL 和 mariadb 数据库，有的话要卸载掉
+
+[root@mysql ~]# rpm -qa | grep mariadb
+mariadb-libs-5.5.68-1.el7.x86_64
+
+检测到 有 mariadb ,现在进行移除卸载：
+[root@mysql ~]# rpm -e --nodeps mariadb-libs-5.5.68-1.el7.x86_64   ------- 成功移除 
+[root@mysql ~]# rpm -qa | grep mariadb
+[root@mysql ~]# 
+
+检查有没有 mysql 包，有的话要移除卸载掉
+[root@mysql ~]# rpm -qa | grep mysql
+[root@mysql ~]# rpm -qa | grep mysqld
+[root@mysql ~]# 
+
+4，安装mysql ,注意要按照顺序来安装 ：
+
+root@mysql ~]# rpm -ivh mysql-community-common-8.0.28-1.el7.x86_64.rpm 
+warning: mysql-community-common-8.0.28-1.el7.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 3a79bd29: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:mysql-community-common-8.0.28-1.e################################# [100%]
+
+[root@mysql ~]# rpm -ivh mysql-community-client-plugins-8.0.28-1.el7.x86_64.rpm 
+warning: mysql-community-client-plugins-8.0.28-1.el7.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 3a79bd29: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:mysql-community-client-plugins-8.################################# [100%]
+
+
+[root@mysql ~]# rpm -ivh mysql-community-libs-8.0.28-1.el7.x86_64.rpm 
+warning: mysql-community-libs-8.0.28-1.el7.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 3a79bd29: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:mysql-community-libs-8.0.28-1.el7################################# [100%]
+
+[root@mysql ~]# rpm -ivh mysql-community-client-8.0.28-1.el7.x86_64.rpm 
+warning: mysql-community-client-8.0.28-1.el7.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 3a79bd29: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:mysql-community-client-8.0.28-1.e################################# [100%]
+
+[root@mysql ~]# rpm -ivh mysql-community-icu-data-files-8.0.28-1.el7.x86_64.rpm 
+warning: mysql-community-icu-data-files-8.0.28-1.el7.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 3a79bd29: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:mysql-community-icu-data-files-8.################################# [100%]
+
+最后一步 安装 mysql server:
+[root@mysql ~]# rpm -ivh mysql-community-server-8.0.28-1.el7.x86_64.rpm 
+warning: mysql-community-server-8.0.28-1.el7.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 3a79bd29: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:mysql-community-server-8.0.28-1.e################################# [100%]
+
+5, 初始化mysqld 服务：
+[root@mysql ~]# mysqld --initialize --console
+[root@mysql ~]# 
+
+6, 更改mysql 文件夹权限，把权限给与Mysql 
+[root@mysql ~]# chown -R mysql:mysql /var/lib/mysql/
+
+7, 开启mysqld 服务，并开机自动启动mysqld 服务：
+[root@mysql ~]# systemctl start mysqld
+[root@mysql ~]# systemctl enable mysqld
+[root@mysql ~]# systemctl status mysqld
+● mysqld.service - MySQL Server
+   Loaded: loaded (/usr/lib/systemd/system/mysqld.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2024-05-12 11:53:44 CST; 1min 58s ago
+     Docs: man:mysqld(8)
+           http://dev.mysql.com/doc/refman/en/using-systemd.html
+ Main PID: 2351 (mysqld)
+   Status: "Server is operational"
+   CGroup: /system.slice/mysqld.service
+           └─2351 /usr/sbin/mysqld
+
+May 12 11:53:42 mysql systemd[1]: Starting MySQL Server...
+May 12 11:53:44 mysql systemd[1]: Started MySQL Server.
+
+8, 查找mysql 安装是给root 用户创建的临时密码：
+[root@mysql ~]# cat /var/log/mysqld.log | grep localhost
+2024-05-12T03:48:06.315620Z 6 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: ZShnJjKtV5:J
+[root@mysql ~]# 
+
+这里可以查看到 MySQL的 临时密码是： ZShnJjKtV5:J
+
+9, 输入临时密码：
+[root@mysql ~]# mysql -u root -p
+Enter password: 
+
+10， 修改 mysql root 用户的密码：
+mysql> alter user 'root'@'localhost' identified by 'Hellokity@20222022'
+    -> ;
+Query OK, 0 rows affected (0.05 sec)
+
+11 ,使用新密码测试登录：
+[root@mysql ~]# mysql -u root -p
+Enter password: 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 9
+Server version: 8.0.28 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> 
+
+顺利登录成功。
+
+
+
+
+
+
+
+
+
