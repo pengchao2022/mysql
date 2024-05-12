@@ -1,0 +1,104 @@
+centos 7 安装 mysql 5.7.30 
+
+1, 检查Linux 上面有没有 mariadb ,有的话 先卸载移除：
+[root@mysql573 ~]# rpm -qa | grep mariadb
+mariadb-libs-5.5.68-1.el7.x86_64
+
+移除 mariadb:
+[root@mysql573 ~]# rpm -e --nodeps mariadb-libs-5.5.68-1.el7.x86_64
+[root@mysql573 ~]# 
+
+2, 检查 Linux 上面有没有MySQL ,有的话 先卸载移除：
+[root@mysql573 ~]# rpm -qa | grep mysql
+[root@mysql573 ~]# 
+没有 就不用移除了
+
+3，下载 MySQL 5.7.30 的 tar 包 
+[root@mysql573 ~]# wget https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.30-1.el7.x86_64.rpm-bundle.tar
+--2024-05-12 12:43:47--  https://downloads.mysql.com/archives/get/p/23/file/mysql-5.7.30-1.el7.x86_64.rpm-bundle.tar
+
+4, 解压 tar 包：
+[root@mysql573 ~]# tar -xvf mysql-5.7.44-1.el7.x86_64.rpm-bundle.tar 
+mysql-community-client-5.7.44-1.el7.x86_64.rpm
+mysql-community-common-5.7.44-1.el7.x86_64.rpm
+mysql-community-devel-5.7.44-1.el7.x86_64.rpm
+mysql-community-embedded-5.7.44-1.el7.x86_64.rpm
+mysql-community-embedded-compat-5.7.44-1.el7.x86_64.rpm
+mysql-community-embedded-devel-5.7.44-1.el7.x86_64.rpm
+mysql-community-libs-5.7.44-1.el7.x86_64.rpm
+mysql-community-libs-compat-5.7.44-1.el7.x86_64.rpm
+mysql-community-server-5.7.44-1.el7.x86_64.rpm
+mysql-community-test-5.7.44-1.el7.x86_64.rpm
+
+5，安装 RPM 包：
+[root@mysql573 ~]# rpm -ivh mysql*.rpm --nodeps --force
+warning: mysql-community-client-5.7.44-1.el7.x86_64.rpm: Header V4 RSA/SHA256 Signature, key ID 3a79bd29: NOKEY
+Preparing...                          ################################# [100%]
+Updating / installing...
+   1:mysql-community-common-5.7.44-1.e################################# [ 10%]
+   2:mysql-community-libs-5.7.44-1.el7################################# [ 20%]
+   3:mysql-community-client-5.7.44-1.e################################# [ 30%]
+   4:mysql-community-server-5.7.44-1.e################################# [ 40%]
+   5:mysql-community-devel-5.7.44-1.el################################# [ 50%]
+   6:mysql-community-embedded-5.7.44-1################################# [ 60%]
+   7:mysql-community-embedded-devel-5.################################# [ 70%]
+   8:mysql-community-test-5.7.44-1.el7################################# [ 80%]
+   9:mysql-community-libs-compat-5.7.4################################# [ 90%]
+  10:mysql-community-embedded-compat-5################################# [100%]
+[root@mysql573 ~]# 
+
+6, 初始化 mysqld
+[root@mysql573 ~]# mysqld --initialize --console
+
+7, 给mysql 文件夹授权：
+[root@mysql573 ~]# chown -R mysql:mysql /var/lib/mysql/
+
+8, 启动mysqld 服务，并设置开机启动：
+[root@mysql573 ~]# systemctl enable mysqld
+[root@mysql573 ~]# systemctl start mysqld
+[root@mysql573 ~]# systemctl status mysqld
+● mysqld.service - MySQL Server
+   Loaded: loaded (/usr/lib/systemd/system/mysqld.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2024-05-12 13:07:30 CST; 5s ago
+     Docs: man:mysqld(8)
+           http://dev.mysql.com/doc/refman/en/using-systemd.html
+  Process: 1478 ExecStart=/usr/sbin/mysqld --daemonize --pid-file=/var/run/mysqld/mysqld.pid $MYSQLD_OPTS (code=exited, status=0/SUCCESS)
+  Process: 1461 ExecStartPre=/usr/bin/mysqld_pre_systemd (code=exited, status=0/SUCCESS)
+ Main PID: 1481 (mysqld)
+   CGroup: /system.slice/mysqld.service
+           └─1481 /usr/sbin/mysqld --daemonize --pid-file=/var/run/mysqld/mysqld.pid
+
+May 12 13:07:29 mysql573 systemd[1]: Starting MySQL Server...
+May 12 13:07:30 mysql573 systemd[1]: Started MySQL Server.
+[root@mysql573 ~]# 
+
+9, 查看 root 的 临时密码 ：
+[root@mysql573 ~]# cat /var/log/mysqld.log | grep localhost
+2024-05-12T05:04:45.564541Z 1 [Note] A temporary password is generated for root@localhost: Wg+uj7a!GT*0
+[root@mysql573 ~]# 
+
+10, 修改 root 的登录密码：
+mysql> alter user 'root'@'localhost' identified by 'Hellokity@20222022';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> 
+
+11, 测试 新密码能不能登录：
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> 
+
+完成。
+
+
+
+
