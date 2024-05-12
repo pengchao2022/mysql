@@ -79,6 +79,9 @@ Updating / installing...
 6, 更改mysql 文件夹权限，把权限给与Mysql 
 [root@mysql ~]# chown -R mysql:mysql /var/lib/mysql/
 
+[root@mysql573 ~]# mkdir /usr/local/mysql/
+[root@mysql573 ~]# chown -R mysql:mysql /usr/local/mysql/
+
 7, 开启mysqld 服务，并开机自动启动mysqld 服务：
 [root@mysql ~]# systemctl start mysqld
 [root@mysql ~]# systemctl enable mysqld
