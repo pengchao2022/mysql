@@ -1,0 +1,24 @@
+mysql 5.7.40 远程连接：
+
+1， 防火墙允许 3306 端口:
+
+[root@mysql573 ~]# firewall-cmd --add-port=3306/tcp --permanent
+Warning: ALREADY_ENABLED: 3306:tcp
+success
+
+2, 重新启动防火墙：
+
+root@mysql573 ~]# systemctl restart firewalld
+
+3, 创建 mysql 的远程登录用户：
+
+mysql> CREATE USER 'allen'@'%' IDENTIFIED BY '123456789';
+Query OK, 0 rows affected (0.00 sec)
+
+4， 给远程用户 Allen 授权：
+
+mysql> GRANT ALL PRIVILEGES ON *.* TO 'allen'@'%';
+Query OK, 0 rows affected (0.00 sec)
+
+测试完成。
+
